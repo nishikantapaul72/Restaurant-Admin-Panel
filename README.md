@@ -75,12 +75,6 @@ A modern, responsive admin dashboard for restaurant management. Built with Next.
 └── tsconfig.json         # TypeScript configuration
 ```
 
-### Key Components
-
-- **MenuManager**: The main component for managing restaurant menu items with pagination, filtering, and CRUD operations
-- **AuthContext**: Manages user authentication state throughout the application
-- **useMenu Hook**: Custom hook that provides menu item operations and state management
-
 ### Data Flow
 
 1. UI components trigger actions via hooks
