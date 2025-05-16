@@ -5,11 +5,14 @@ import { Button } from "primereact/button";
 import { useRouter } from "next/navigation";
 import { Menu } from "primereact/menu";
 import { Toast } from "primereact/toast";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function SizeDemo() {
   const [visible, setVisible] = useState(false);
   const toast = useRef(null);
   const router = useRouter();
+  const { logout } = useAuth();
+
   const items = [
     {
       label: "Navigation",
@@ -27,7 +30,7 @@ export default function SizeDemo() {
         {
           label: "Menu Items",
           icon: "pi pi-list",
-          command: () => router.push("/menu-items"),
+          command: () => router.push("/menu"),
         },
         {
           label: "Customers",
@@ -47,9 +50,7 @@ export default function SizeDemo() {
         {
           label: "Logout",
           icon: "pi pi-sign-out",
-          command: () => {
-            router.push("/login");
-          },
+          command: () => logout(),
         },
       ],
     },

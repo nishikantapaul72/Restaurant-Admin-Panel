@@ -1,6 +1,7 @@
 "use client";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import Cookies from "js-cookie";
 
 export const useAuth = () => {
   const [loading, setLoading] = useState(false);
@@ -11,16 +12,11 @@ export const useAuth = () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      });
-      const data = await response.json();
-      if (response.ok) {
+      if (email && password) {
+        Cookies.set("auth_token", "demo_token", { expires: 7 });
         router.push("/dashboard");
       } else {
-        setError(data.message);
+        setError("Invalid credentials");
       }
     } catch (err) {
       setError("An error occurred. Please try again.");
@@ -34,16 +30,11 @@ export const useAuth = () => {
     setError(null);
 
     try {
-      const response = await fetch("/api/auth/signup", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      });
-      const data = await response.json();
-      if (response.ok) {
+      if (email && password) {
+        // Successful signup but don't set a cookie yet
         router.push("/login");
       } else {
-        setError(data.message);
+        setError("Invalid credentials");
       }
     } catch (err) {
       setError("An error occurred. Please try again.");
@@ -51,5 +42,11 @@ export const useAuth = () => {
       setLoading(false);
     }
   };
-  return { login, signup, loading, error };
+
+  const logout = () => {
+    Cookies.remove("auth_token");
+    router.push("/login");
+  };
+
+  return { login, signup, logout, loading, error };
 };
