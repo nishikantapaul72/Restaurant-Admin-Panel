@@ -23,6 +23,7 @@ export const useMenu = () => {
         method: "GET",
         headers: { "Content-Type": "application/json" },
       });
+      console.log("fetch menu response: ", response);
       const data = await response.json();
       if (response.ok) {
         setMenuItems(data);

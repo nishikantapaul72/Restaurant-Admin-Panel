@@ -1,6 +1,7 @@
 export interface Order {
   id: number;
   customer: {
+    customerId: number;
     name: string;
     email: string;
   };
@@ -10,6 +11,6 @@ export interface Order {
     quantity: number;
   }[];
   total: number;
-  status: "Pending" | "Preparing" | "Completed";
+  status: "Pending" | "Preparing" | "Completed" | "Delivered";
   createdAt: string;
 }

@@ -22,14 +22,9 @@ export default function OrderManager() {
 
   const statusOptions = [
     { label: "Pending", value: "Pending" },
-    { label: "Confirmed", value: "Confirmed" },
     { label: "Preparing", value: "Preparing" },
-    { label: "Ready for Pickup", value: "Ready for Pickup" },
-    { label: "Out for Delivery", value: "Out for Delivery" },
-    { label: "Delivered", value: "Delivered" },
     { label: "Completed", value: "Completed" },
-    { label: "Cancelled", value: "Cancelled" },
-    { label: "Refunded", value: "Refunded" },
+    { label: "Delivered", value: "Delivered" },
   ];
 
   const handleStatusChange = async (order: Order, status: string) => {

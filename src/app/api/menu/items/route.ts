@@ -1,66 +1,112 @@
 import { NextRequest, NextResponse } from "next/server";
 
-let menuItems = [
-  {
-    id: 1,
-    name: "Burger",
-    price: 8.99,
-    availability: true,
-    category: "Meals",
-  },
-  {
-    id: 2,
-    name: "Mojo",
-    price: 2.5,
-    availability: false,
-    category: "Drinks",
-  },
-];
-
 export async function GET(request: NextRequest) {
-  return NextResponse.json(menuItems, { status: 200 });
+  try {
+    const response = await fetch('http://localhost:3001/menuItems');
+    console.log('Response from menu items:', response);
+    if (!response.ok) {
+      throw new Error('Failed to fetch menu items');
+    }
+    const menuItems = await response.json();
+    return NextResponse.json(menuItems, { status: 200 });
+  } catch (error) {
+    console.error('Error fetching menu items:', error);
+    return NextResponse.json(
+      { error: 'Failed to fetch menu items' },
+      { status: 500 }
+    );
+  }
 }
 
 export async function POST(request: NextRequest) {
-  const { name, price, availability, category } = await request.json();
-  if (!name || !price || !category) {
-    return NextResponse.json({ message: "Missing required fields" }, { status: 400 });
-  }
+  try {
+    const data = await request.json();
+    
+    const newItem = {
+      id: data.id,
+      name: data.name,
+      price: parseFloat(data.price),
+      category: data.category,
+      availability: data.availability ?? true
+    };
 
-  const newItem = {
-    id: menuItems.length + 1,
-    name,
-    price: parseFloat(price),
-    availability: availability ?? true,
-    category,
-  };
-  menuItems.push(newItem);
-  return NextResponse.json(newItem, { status: 201 });
+    const response = await fetch('http://localhost:3001/menuItems', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(newItem),
+    });
+    
+    if (!response.ok) {
+      throw new Error('Failed to create menu item');
+    }
+    
+    const createdItem = await response.json();
+    return NextResponse.json(createdItem, { status: 201 });
+  } catch (error) {
+    console.error('Error creating menu item:', error);
+    return NextResponse.json(
+      { error: 'Failed to create menu item' },
+      { status: 500 }
+    );
+  }
 }
 
 export async function PUT(request: NextRequest) {
-  const { id, name, price, availability, category } = await request.json();
-  const itemIndex = menuItems.findIndex((item) => item.id === id);
-  if (itemIndex === -1) {
-    return NextResponse.json({ message: "Item not found" }, { status: 404 });
+  try {
+    const data = await request.json();
+    const { id } = data;
+    
+    // Ensure consistent property order in updates too
+    const updatedItem = {
+      id: data.id,
+      name: data.name,
+      price: parseFloat(data.price),
+      category: data.category,
+      availability: data.availability ?? true
+    };
+    
+    const response = await fetch(`http://localhost:3001/menuItems/${id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(updatedItem),
+    });
+    
+    if (!response.ok) {
+      throw new Error('Failed to update menu item');
+    }
+    
+    const responseItem = await response.json();
+    return NextResponse.json(responseItem, { status: 200 });
+  } catch (error) {
+    console.error('Error updating menu item:', error);
+    return NextResponse.json(
+      { error: 'Failed to update menu item' },
+      { status: 500 }
+    );
   }
-
-  menuItems[itemIndex] = {
-    ...menuItems[itemIndex],
-    name: name ?? menuItems[itemIndex].name,
-    price: price ? parseFloat(price) : menuItems[itemIndex].price,
-    availability: availability ?? menuItems[itemIndex].availability,
-    category: category ?? menuItems[itemIndex].category,
-  };
-  return NextResponse.json(menuItems[itemIndex], { status: 200 });
 }
 
 export async function DELETE(request: NextRequest) {
-  const { id } = await request.json();
-  const itemIndex = menuItems.findIndex((item) => item.id === id);
-  if (itemIndex === -1) {
-    return NextResponse.json({ message: "Item not found" }, { status: 404 });
+  try {
+    const { id } = await request.json();
+    const response = await fetch(`http://localhost:3001/menuItems/${id}`, {
+      method: 'DELETE',
+    });
+    
+    if (!response.ok) {
+      throw new Error('Failed to delete menu item');
+    }
+    
+    return NextResponse.json({ message: 'Item deleted' }, { status: 200 });
+  } catch (error) {
+    console.error('Error deleting menu item:', error);
+    return NextResponse.json(
+      { error: 'Failed to delete menu item' },
+      { status: 500 }
+    );
   }
-  menuItems = menuItems.filter((item) => item.id !== id);
-  return NextResponse.json({ message: "Item deleted" }, { status: 200 });
 }
