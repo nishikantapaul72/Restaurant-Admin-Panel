@@ -1,28 +1,7 @@
 "use client";
-import { useState, useCallback } from "react";
-import { MenuItem } from "@/types/menu";
-
-interface MenuItemData {
-  name: string;
-  price: number;
-  availability: boolean;
-  category: string;
-}
-
-interface PaginatedResponse {
-  items: MenuItem[];
-  totalCount: number;
-  currentPage: number;
-  limit: number;
-  message?: string;
-}
-
-interface FetchMenuItemsParams {
-  page?: number;
-  limit?: number;
-  name?: string;
-  category?: string;
-}
+import { categoriesApi, menuApi } from "@/lib/api";
+import { FetchMenuItemsParams, MenuItem } from "@/types/menu";
+import { useCallback, useState } from "react";
 
 export const useMenu = () => {
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
@@ -32,75 +11,58 @@ export const useMenu = () => {
   const [totalCount, setTotalCount] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
 
-  const fetchMenuItems = useCallback(async (params: FetchMenuItemsParams = {}) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const searchParams = new URLSearchParams();
-      
-      if (params.page) searchParams.append('_page', params.page.toString());
-      if (params.limit) searchParams.append('_limit', params.limit.toString());
-      
-      if (params.name) searchParams.append('name_like', params.name);
-      if (params.category) searchParams.append('category', params.category);
+  const fetchMenuItems = useCallback(
+    async (params: FetchMenuItemsParams = {}) => {
+      setLoading(true);
+      setError(null);
+      try {
+        const apiParams = {
+          _page: params.page,
+          _limit: params.limit,
+          name_like: params.name,
+          category: params.category,
+        };
 
-      const response = await fetch(`/api/menu/items?${searchParams.toString()}`, {
-        method: "GET",
-        headers: { "Content-Type": "application/json" },
-      });
-      
-      const data: PaginatedResponse = await response.json();
-      
-      if (response.ok) {
-        setMenuItems(data.items);
-        setTotalCount(data.totalCount);
-        setCurrentPage(data.currentPage);
-      } else {
-        setError(data.message || "Failed to fetch menu items");
+        const response = await menuApi.getItems(apiParams);
+        setMenuItems(response.items);
+        setTotalCount(response.totalCount);
+        setCurrentPage(response.currentPage);
+      } catch (error: any) {
+        setError(
+          error.response?.data?.message ||
+            "An error occurred. Please try again."
+        );
+      } finally {
+        setLoading(false);
       }
-    } catch (err) {
-      setError("An error occurred. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+    },
+    []
+  );
 
   const fetchCategories = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch("/api/menu/categories", {
-        method: "GET",
-        headers: { "Content-Type": "application/json" },
-      });
-      const data = await response.json();
-      if (response.ok) {
-        setCategories(data);
-      } else {
-        setError(data.message || "Failed to fetch categories");
-      }
-    } catch (err) {
-      setError("An error occurred. Please try again.");
+      const categories = await categoriesApi.getAll();
+      setCategories(categories);
+    } catch (error: any) {
+      setError(
+        error.response?.data?.message || "An error occurred. Please try again."
+      );
     } finally {
       setLoading(false);
     }
   }, []);
 
-  const addMenuItem = async (data: MenuItemData) => {
+  const addMenuItem = async (data: MenuItem) => {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch("/api/menu/items", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
-      const result = await response.json();
-      if (!response.ok) {
-        setError(result.message || "Failed to add item");
-      }
-    } catch (err) {
-      setError("An error occurred. Please try again.");
+      await menuApi.createItem(data);
+    } catch (error: any) {
+      setError(
+        error.response?.data?.message || "An error occurred. Please try again."
+      );
     } finally {
       setLoading(false);
     }
@@ -110,17 +72,12 @@ export const useMenu = () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch("/api/menu/items", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
-      const result = await response.json();
-      if (!response.ok) {
-        setError(result.message || "Failed to update item");
-      }
-    } catch (err) {
-      setError("An error occurred. Please try again.");
+      if (!data.id) throw new Error('Item ID is required');
+      await menuApi.updateItem(data.id, data);
+    } catch (error: any) {
+      setError(
+        error.response?.data?.message || "An error occurred. Please try again."
+      );
     } finally {
       setLoading(false);
     }
@@ -130,33 +87,27 @@ export const useMenu = () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch("/api/menu/items", {
-        method: "DELETE",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id }),
-      });
-      const result = await response.json();
-      if (!response.ok) {
-        setError(result.message || "Failed to delete item");
-      }
-    } catch (err) {
-      setError("An error occurred. Please try again.");
+      await menuApi.deleteItem(id);
+    } catch (error: any) {
+      setError(
+        error.response?.data?.message || "An error occurred. Please try again."
+      );
     } finally {
       setLoading(false);
     }
   };
 
-  return { 
-    menuItems, 
-    categories, 
-    loading, 
-    error, 
+  return {
+    menuItems,
+    categories,
+    loading,
+    error,
     totalCount,
     currentPage,
-    fetchMenuItems, 
-    fetchCategories, 
-    addMenuItem, 
-    updateMenuItem, 
-    deleteMenuItem 
+    fetchMenuItems,
+    fetchCategories,
+    addMenuItem,
+    updateMenuItem,
+    deleteMenuItem,
   };
 };

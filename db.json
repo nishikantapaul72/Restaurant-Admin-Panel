@@ -146,6 +146,13 @@
       "category": "Desserts",
       "availability": true,
       "id": 7
+    },
+    {
+      "category": "Desserts",
+      "availability": true,
+      "price": 12,
+      "name": "Paul72",
+      "id": 8
     }
   ],
   "categories": [

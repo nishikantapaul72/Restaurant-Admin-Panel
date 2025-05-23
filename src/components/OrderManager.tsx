@@ -9,16 +9,21 @@ import { useOrders } from "@/hooks/useOrders";
 import { Order } from "@/types/orders";
 
 export default function OrderManager() {
-  const { orders, loading, error, fetchOrders, updateOrderStatus } =
+  const { orders, loading, error, totalCount, currentPage, fetchOrders, updateOrderStatus } =
     useOrders();
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [showDetailsDialog, setShowDetailsDialog] = useState(false);
   const [first, setFirst] = useState(0);
   const [rows, setRows] = useState(10);
-
+  const [searchName, setSearchName] = useState("");
+  const [selectedStatus, setSelectedStatus] = useState("");
+  console.log("Status",selectedStatus);
   useEffect(() => {
-    fetchOrders();
-  }, [fetchOrders]);
+    fetchOrders({
+      page: 1,
+      limit: rows,
+    });
+  }, []);
 
   const statusOptions = [
     { label: "Pending", value: "Pending" },
@@ -29,13 +34,39 @@ export default function OrderManager() {
 
   const handleStatusChange = async (order: Order, status: string) => {
     await updateOrderStatus(order.id, status);
-    fetchOrders();
+    fetchOrders({
+      page: currentPage,
+      limit: rows,
+      name: searchName || undefined,
+      status: selectedStatus || undefined,
+    });
   };
 
   const onPageChange = (event: any) => {
-    setFirst(event.first);
-    setRows(event.rows);
+    const newFirst = event.first;
+    const newRows = event.rows;
+    setFirst(newFirst);
+    setRows(newRows);
+
+    const newPage = Math.floor(newFirst / newRows);
+
+    fetchOrders({
+      page: newPage + 1,
+      limit: newRows,
+      name: searchName || undefined,
+      status: selectedStatus || undefined,
+    });
   };
+
+  useEffect(()=>{
+    setFirst(0);
+    fetchOrders({
+      page: 1,
+      limit: rows,
+      name: searchName || undefined,
+      status: selectedStatus || undefined,
+    });
+  },[searchName, selectedStatus]);
 
   const statusBodyTemplate = (rowData: Order) => {
     return (
@@ -71,6 +102,37 @@ export default function OrderManager() {
 
   return (
     <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <div className="flex gap-4">
+          <div className="p-input-icon-left">
+            <input
+              type="text"
+              value={searchName}
+              onChange={(e) => setSearchName(e.target.value)}
+              placeholder="Search by customer name"
+              className="p-inputtext p-component p-filled w-full"
+            />
+          </div>
+          <Dropdown
+            value={selectedStatus}
+            onChange={(e) => setSelectedStatus(e.value)}
+            options={statusOptions}
+            placeholder="Filter by status"
+            className="w-48"
+          />
+          {(searchName || selectedStatus) && (
+            <Button
+              icon="pi pi-filter-slash"
+              className="p-button-outlined"
+              onClick={() => {
+                setSearchName("");
+                setSelectedStatus("");
+              }}
+              tooltip="Clear filters"
+            />
+          )}
+        </div>
+      </div>
       {loading && <div>Loading...</div>}
       {error && <div className="text-red-500">Error: {error}</div>}
 
@@ -82,6 +144,7 @@ export default function OrderManager() {
         rows={rows}
         rowsPerPageOptions={[5, 10, 20, 50]}
         first={first}
+        totalRecords={totalCount}
         onPage={onPageChange}
         paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
         currentPageReportTemplate="Showing {first} to {last} of {totalRecords} items"

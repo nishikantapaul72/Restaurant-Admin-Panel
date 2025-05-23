@@ -14,3 +14,11 @@ export interface Order {
   status: "Pending" | "Preparing" | "Completed" | "Delivered";
   createdAt: string;
 }
+
+
+export interface FetchOrderItemsParams {
+  page?: number;
+  limit?: number;
+  name?: string;
+  status?: string;
+}
