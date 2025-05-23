@@ -103,14 +103,6 @@
   },
   "menuItems": [
     {
-      "id": 1,
-      "name": "Margherita Pizza",
-      "description": "Classic tomato sauce, mozzarella, and basil",
-      "price": 12.99,
-      "category": "Pizza",
-      "availability": true
-    },
-    {
       "id": 2,
       "name": "Caesar Salad",
       "description": "Romaine lettuce, croutons, parmesan, and Caesar dressing",
@@ -147,9 +139,23 @@
       "category": "Pizza",
       "availability": true,
       "id": 6
+    },
+    {
+      "name": "Paul72",
+      "price": 10,
+      "category": "Desserts",
+      "availability": true,
+      "id": 7
     }
   ],
-  "categories": ["Pizza", "Salads", "Meals", "Drinks", "Desserts", "Snacks"],
+  "categories": [
+    "Pizza",
+    "Salads",
+    "Meals",
+    "Drinks",
+    "Desserts",
+    "Snacks"
+  ],
   "orders": [
     {
       "id": 1,
@@ -171,7 +177,7 @@
         }
       ],
       "total": 20.48,
-      "status": "Completed",
+      "status": "Pending",
       "createdAt": "2025-05-16T10:00:00+06:00"
     },
     {

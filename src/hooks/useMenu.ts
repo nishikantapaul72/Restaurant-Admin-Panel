@@ -9,24 +9,52 @@ interface MenuItemData {
   category: string;
 }
 
+interface PaginatedResponse {
+  items: MenuItem[];
+  totalCount: number;
+  currentPage: number;
+  limit: number;
+  message?: string;
+}
+
+interface FetchMenuItemsParams {
+  page?: number;
+  limit?: number;
+  name?: string;
+  category?: string;
+}
+
 export const useMenu = () => {
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
   const [categories, setCategories] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [totalCount, setTotalCount] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
 
-  const fetchMenuItems = useCallback(async () => {
+  const fetchMenuItems = useCallback(async (params: FetchMenuItemsParams = {}) => {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch("/api/menu/items", {
+      const searchParams = new URLSearchParams();
+      
+      if (params.page) searchParams.append('_page', params.page.toString());
+      if (params.limit) searchParams.append('_limit', params.limit.toString());
+      
+      if (params.name) searchParams.append('name_like', params.name);
+      if (params.category) searchParams.append('category', params.category);
+
+      const response = await fetch(`/api/menu/items?${searchParams.toString()}`, {
         method: "GET",
         headers: { "Content-Type": "application/json" },
       });
-      console.log("fetch menu response: ", response);
-      const data = await response.json();
+      
+      const data: PaginatedResponse = await response.json();
+      
       if (response.ok) {
-        setMenuItems(data);
+        setMenuItems(data.items);
+        setTotalCount(data.totalCount);
+        setCurrentPage(data.currentPage);
       } else {
         setError(data.message || "Failed to fetch menu items");
       }
@@ -118,5 +146,17 @@ export const useMenu = () => {
     }
   };
 
-  return { menuItems, categories, loading, error, fetchMenuItems, fetchCategories, addMenuItem, updateMenuItem, deleteMenuItem };
+  return { 
+    menuItems, 
+    categories, 
+    loading, 
+    error, 
+    totalCount,
+    currentPage,
+    fetchMenuItems, 
+    fetchCategories, 
+    addMenuItem, 
+    updateMenuItem, 
+    deleteMenuItem 
+  };
 };

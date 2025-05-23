@@ -2,13 +2,39 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(request: NextRequest) {
   try {
-    const response = await fetch('http://localhost:3001/menuItems');
-    console.log('Response from menu items:', response);
+    const { searchParams } = new URL(request.url);
+    
+    const page = searchParams.get('_page') || '1';
+    const limit = searchParams.get('_limit') || '10';
+    
+    const name = searchParams.get('name_like');
+    const category = searchParams.get('category');
+    
+    let apiUrl = 'http://localhost:3001/menuItems?';
+    const params = new URLSearchParams();
+    
+    params.append('_page', page);
+    params.append('_limit', limit);
+    
+    if (name) params.append('name_like', name);
+    if (category) params.append('category', category);
+    
+    const response = await fetch(`${apiUrl}${params.toString()}`);
+    
     if (!response.ok) {
       throw new Error('Failed to fetch menu items');
     }
+    
     const menuItems = await response.json();
-    return NextResponse.json(menuItems, { status: 200 });
+    
+    const totalCount = response.headers.get('X-Total-Count');
+    
+    return NextResponse.json({
+      items: menuItems,
+      totalCount: parseInt(totalCount || '0'),
+      currentPage: parseInt(page),
+      limit: parseInt(limit)
+    }, { status: 200 });
   } catch (error) {
     console.error('Error fetching menu items:', error);
     return NextResponse.json(
