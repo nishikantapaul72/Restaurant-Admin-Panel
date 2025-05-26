@@ -34,6 +34,7 @@ export default function MenuManager() {
   const [searchName, setSearchName] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
 
+  console.log("total count : ",totalCount);
   interface FormData {
     name: string;
     price: number;
@@ -76,13 +77,15 @@ export default function MenuManager() {
   const onPageChange = (event: any) => {
     const newFirst = event.first;
     const newRows = event.rows;
+    console.log("new First",newFirst);
+    console.log("new Rows",newRows);
     setFirst(newFirst);
     setRows(newRows);
 
     const newPage = Math.floor(newFirst / newRows);
 
     fetchMenuItems({
-      page: newPage,
+      page: newPage + 1,
       limit: newRows,
       name: searchName || undefined,
       category: selectedCategory || undefined,
@@ -123,7 +126,7 @@ export default function MenuManager() {
     setShowDialog(false);
     const currentPage = Math.floor(first / rows);
     fetchMenuItems({
-      page: currentPage,
+      page: currentPage + 1,
       limit: rows,
       name: searchName || undefined,
       category: selectedCategory || undefined,
@@ -134,7 +137,7 @@ export default function MenuManager() {
     await deleteMenuItem(id);
     const currentPage = Math.floor(first / rows);
     fetchMenuItems({
-      page: currentPage,
+      page: currentPage + 1,
       limit: rows,
       name: searchName || undefined,
       category: selectedCategory || undefined,
@@ -185,9 +188,7 @@ export default function MenuManager() {
           <Dropdown
             value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.value)}
-            options={[
-              ...categories.map((cat) => ({ label: cat, value: cat })),
-            ]}
+            options={[...categories.map((cat) => ({ label: cat, value: cat }))]}
             placeholder="Filter by category"
             className="p-inputtext-sm"
           />
@@ -224,6 +225,7 @@ export default function MenuManager() {
         first={first}
         onPage={onPageChange}
         totalRecords={totalCount}
+        lazy
         paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
         currentPageReportTemplate="Showing {first} to {last} of {totalRecords} items"
         loading={loading}

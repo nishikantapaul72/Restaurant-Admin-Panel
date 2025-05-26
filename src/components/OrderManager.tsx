@@ -1,12 +1,29 @@
 "use client";
-import { useState, useEffect } from "react";
-import { DataTable } from "primereact/datatable";
-import { Column } from "primereact/column";
-import { Button } from "primereact/button";
-import { Dialog } from "primereact/dialog";
-import { Dropdown } from "primereact/dropdown";
 import { useOrders } from "@/hooks/useOrders";
 import { Order } from "@/types/orders";
+import { Button } from "primereact/button";
+import { Column } from "primereact/column";
+import { DataTable } from "primereact/datatable";
+import { Dialog } from "primereact/dialog";
+import { Dropdown } from "primereact/dropdown";
+import { useEffect, useState } from "react";
+
+// Custom debounce hook
+const useDebounce = (value: string, delay: number) => {
+  const [debouncedValue, setDebouncedValue] = useState(value);
+
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      setDebouncedValue(value);
+    }, delay);
+
+    return () => {
+      clearTimeout(timeout);
+    };
+  }, [value]);
+
+  return debouncedValue;
+};
 
 export default function OrderManager() {
   const { orders, loading, error, totalCount, currentPage, fetchOrders, updateOrderStatus } =
@@ -17,13 +34,20 @@ export default function OrderManager() {
   const [rows, setRows] = useState(10);
   const [searchName, setSearchName] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("");
-  console.log("Status",selectedStatus);
+
+
+  // Apply debounce to searchName
+  const debouncedSearchName = useDebounce(searchName, 500); // 500ms delay
+
   useEffect(() => {
+    setFirst(0);
     fetchOrders({
       page: 1,
       limit: rows,
+      name: debouncedSearchName || undefined,
+      status: selectedStatus || undefined,
     });
-  }, []);
+  }, [debouncedSearchName, selectedStatus]); // Use debouncedSearchName instead of searchName
 
   const statusOptions = [
     { label: "Pending", value: "Pending" },
@@ -37,7 +61,7 @@ export default function OrderManager() {
     fetchOrders({
       page: currentPage,
       limit: rows,
-      name: searchName || undefined,
+      name: debouncedSearchName || undefined,
       status: selectedStatus || undefined,
     });
   };
@@ -53,20 +77,10 @@ export default function OrderManager() {
     fetchOrders({
       page: newPage + 1,
       limit: newRows,
-      name: searchName || undefined,
+      name: debouncedSearchName || undefined,
       status: selectedStatus || undefined,
     });
   };
-
-  useEffect(()=>{
-    setFirst(0);
-    fetchOrders({
-      page: 1,
-      limit: rows,
-      name: searchName || undefined,
-      status: selectedStatus || undefined,
-    });
-  },[searchName, selectedStatus]);
 
   const statusBodyTemplate = (rowData: Order) => {
     return (
@@ -108,7 +122,13 @@ export default function OrderManager() {
             <input
               type="text"
               value={searchName}
-              onChange={(e) => setSearchName(e.target.value)}
+              onChange={(e) => {
+                const input = e.target.value;
+                if (searchName === '' && input.startsWith(' ')) {
+                  return;
+                }
+                setSearchName(input);
+              }}
               placeholder="Search by customer name"
               className="p-inputtext p-component p-filled w-full"
             />
