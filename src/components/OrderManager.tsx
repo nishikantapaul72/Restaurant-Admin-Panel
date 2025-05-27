@@ -7,6 +7,7 @@ import { DataTable } from "primereact/datatable";
 import { Dialog } from "primereact/dialog";
 import { Dropdown } from "primereact/dropdown";
 import { useEffect, useState } from "react";
+import jsPDF from 'jspdf';
 
 // Custom debounce hook
 const useDebounce = (value: string, delay: number) => {
@@ -114,6 +115,49 @@ export default function OrderManager() {
     });
   };
 
+  const generatePDF = (order: Order) => {
+    const doc = new jsPDF();
+    const lineHeight = 10;
+    let yPos = 20;
+
+    // Add title
+    doc.setFontSize(20);
+    doc.text(`Order #${order.id} Details`, 20, yPos);
+    yPos += lineHeight * 2;
+
+    // Add customer info
+    doc.setFontSize(14);
+    doc.text('Customer Information:', 20, yPos);
+    yPos += lineHeight;
+    doc.setFontSize(12);
+    doc.text(`Name: ${order.customer.name}`, 20, yPos);
+    yPos += lineHeight;
+    doc.text(`Email: ${order.customer.email}`, 20, yPos);
+    yPos += lineHeight * 1.5;
+
+    // Add order items
+    doc.setFontSize(14);
+    doc.text('Order Items:', 20, yPos);
+    yPos += lineHeight;
+    doc.setFontSize(12);
+    
+    order.items.forEach(item => {
+      doc.text(`${item.name} - $${item.price.toFixed(2)} x ${item.quantity} = $${(item.price * item.quantity).toFixed(2)}`, 20, yPos);
+      yPos += lineHeight;
+    });
+    yPos += lineHeight * 0.5;
+
+    // Add total and status
+    doc.text(`Total: $${order.total.toFixed(2)}`, 20, yPos);
+    yPos += lineHeight;
+    doc.text(`Status: ${order.status}`, 20, yPos);
+    yPos += lineHeight;
+    doc.text(`Created At: ${formatDate(order.createdAt)}`, 20, yPos);
+
+    // Save the PDF
+    doc.save(`order-${order.id}.pdf`);
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -204,6 +248,14 @@ export default function OrderManager() {
       >
         {selectedOrder && (
           <div className="space-y-4">
+            <div className="flex justify-end mb-4">
+              <Button
+                icon="pi pi-download"
+                className="p-button-secondary"
+                onClick={() => generatePDF(selectedOrder)}
+                tooltip="Download PDF"
+              />
+            </div>
             <div>
               <h3 className="font-bold">Customer Info</h3>
               <p>Name: {selectedOrder.customer.name}</p>

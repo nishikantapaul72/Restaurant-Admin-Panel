@@ -195,6 +195,20 @@
       "price": 2332,
       "name": "we",
       "id": 14
+    },
+    {
+      "category": "Salads",
+      "availability": true,
+      "price": 1,
+      "name": "rm",
+      "id": 15
+    },
+    {
+      "category": "Desserts",
+      "availability": true,
+      "price": 0.97,
+      "name": "Paul72",
+      "id": 16
     }
   ],
   "categories": [
