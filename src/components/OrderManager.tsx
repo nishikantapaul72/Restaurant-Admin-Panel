@@ -8,24 +8,7 @@ import { Dialog } from "primereact/dialog";
 import { Dropdown } from "primereact/dropdown";
 import { useEffect, useState } from "react";
 import jsPDF from 'jspdf';
-
-// Custom debounce hook
-const useDebounce = (value: string, delay: number) => {
-  const [debouncedValue, setDebouncedValue] = useState(value);
-
-  useEffect(() => {
-    const timeout = setTimeout(() => {
-      setDebouncedValue(value);
-    }, delay);
-
-    return () => {
-      clearTimeout(timeout);
-    };
-  }, [value]);
-
-  return debouncedValue;
-};
-
+import { useDebounce } from "@/hooks/useDebounce";
 export default function OrderManager() {
   const { orders, loading, error, totalCount, currentPage, fetchOrders, updateOrderStatus } =
     useOrders();
@@ -38,7 +21,7 @@ export default function OrderManager() {
 
 
   // Apply debounce to searchName
-  const debouncedSearchName = useDebounce(searchName, 500); // 500ms delay
+  const { debouncedValue: debouncedSearchName, clearImmediate } = useDebounce(searchName, 500); // 500ms delay
 
   useEffect(() => {
     setFirst(0);
@@ -56,7 +39,11 @@ export default function OrderManager() {
     { label: "Completed", value: "Completed" },
     { label: "Delivered", value: "Delivered" },
   ];
-
+  const clearFilters = () => {
+    setSearchName("");
+    setSelectedStatus("");
+    clearImmediate(); // Immediately clear the debounced value
+  };
   const handleStatusChange = async (order: Order, status: string) => {
     await updateOrderStatus(order.id, status);
     fetchOrders({
@@ -140,7 +127,7 @@ export default function OrderManager() {
     doc.text('Order Items:', 20, yPos);
     yPos += lineHeight;
     doc.setFontSize(12);
-    
+
     order.items.forEach(item => {
       doc.text(`${item.name} - $${item.price.toFixed(2)} x ${item.quantity} = $${(item.price * item.quantity).toFixed(2)}`, 20, yPos);
       yPos += lineHeight;
@@ -188,10 +175,11 @@ export default function OrderManager() {
             <Button
               icon="pi pi-filter-slash"
               className="p-button-outlined"
-              onClick={() => {
-                setSearchName("");
-                setSelectedStatus("");
-              }}
+              // onClick={() => {
+              //   setSearchName("");
+              //   setSelectedStatus("");
+              // }}
+              onClick={clearFilters}
               tooltip="Clear filters"
             />
           )}

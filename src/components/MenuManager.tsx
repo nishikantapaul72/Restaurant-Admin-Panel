@@ -143,7 +143,6 @@ export default function MenuManager() {
       category: selectedCategory || undefined,
     });
   };
-
   const actionBodyTemplate = (rowData: MenuItem) => {
     return (
       <div className="flex gap-2">
