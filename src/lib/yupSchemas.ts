@@ -4,7 +4,7 @@ const containsUppercase = /(?=.*[A-Z])/;
 const containsLowercase = /(?=.*[a-z])/;
 const containsNumber = /(?=.*[0-9])/;
 const containsSpecial = /(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?])/;
-const noConsecutiveChars = /(?!.*(.)\1{2})/; 
+const noConsecutiveChars = /(?!.*(.)\1{2})/;
 const noCommonWords = /(?!password|123456|qwerty|admin).*/i;
 
 const commonTypos: Record<string, string> = {
@@ -139,7 +139,16 @@ export const signupSchema = Yup.object({
 
 export const menuItemSchema = Yup.object({
   name: Yup.string().required("Name is required"),
-  price: Yup.number().required("Price is required").min(0, "Price must be positive"),
+  price: Yup.number()
+    .required("Price is required")
+    .min(0, "Price must be positive"),
   availability: Yup.boolean().required(),
   category: Yup.string().required("Category is required"),
+});
+
+export const customerDetailsSchema = Yup.object({
+  name: Yup.string().required("Name is required"),
+  phone: Yup.string().required(""),
+  address: Yup.string().required("Address is required"),
+  loyaltyPoints: Yup.number().required("Loyalty Points is required"),
 });

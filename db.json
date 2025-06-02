@@ -103,22 +103,6 @@
   },
   "menuItems": [
     {
-      "id": 2,
-      "name": "Caesar Salad",
-      "description": "Romaine lettuce, croutons, parmesan, and Caesar dressing",
-      "price": 8.99,
-      "category": "Salads",
-      "availability": true
-    },
-    {
-      "id": 3,
-      "name": "Burger",
-      "description": "Classic beef burger with lettuce and tomato",
-      "price": 8.99,
-      "category": "Meals",
-      "availability": true
-    },
-    {
       "id": 4,
       "name": "Mojo",
       "description": "Refreshing citrus drink",
@@ -209,6 +193,13 @@
       "price": 0.97,
       "name": "Paul72",
       "id": 16
+    },
+    {
+      "category": "Drinks",
+      "availability": true,
+      "price": 12.98,
+      "name": "rmjfshfs",
+      "id": 17
     }
   ],
   "categories": [
@@ -240,7 +231,7 @@
         }
       ],
       "total": 20.48,
-      "status": "Pending",
+      "status": "Delivered",
       "createdAt": "2025-05-16T10:00:00+06:00"
     },
     {
@@ -258,7 +249,7 @@
         }
       ],
       "total": 12.99,
-      "status": "Preparing",
+      "status": "Pending",
       "createdAt": "2025-05-16T11:30:00+06:00"
     },
     {
@@ -281,8 +272,94 @@
         }
       ],
       "total": 15.5,
-      "status": "Delivered",
+      "status": "Completed",
       "createdAt": "2025-05-15T14:45:00+06:00"
+    }
+  ],
+  "customers": [
+    {
+      "id": 2,
+      "name": "Jane Smith",
+      "email": "jane@example.com",
+      "phone": "+8801711000002",
+      "address": {
+        "street": "45 Banani Road",
+        "city": "Dhaka",
+        "postalCode": "1213",
+        "country": "Bangladesh"
+      },
+      "loyaltyPoints": 200,
+      "registeredAt": "2024-11-15T12:30:00+06:00"
+    },
+    {
+      "id": 3,
+      "name": "Alice Johnson",
+      "email": "alice@example.com",
+      "phone": "+8801711000003",
+      "address": {
+        "street": "78 Uttara Sector 3",
+        "city": "Dhaka",
+        "postalCode": "1230",
+        "country": "Bangladesh"
+      },
+      "loyaltyPoints": 90,
+      "registeredAt": "2025-01-05T09:00:00+06:00"
+    },
+    {
+      "id": 4,
+      "name": "Michael Lee",
+      "email": "michael.lee@example.com",
+      "phone": "+8801711000004",
+      "address": {
+        "street": "35 Mirpur Road",
+        "city": "Dhaka",
+        "postalCode": "1207",
+        "country": "Bangladesh"
+      },
+      "loyaltyPoints": 120,
+      "registeredAt": "2024-12-01T09:00:00+06:00"
+    },
+    {
+      "id": 5,
+      "name": "Sara Ahmed",
+      "email": "sara.ahmed@example.com",
+      "phone": "+8801711000005",
+      "address": {
+        "street": "9 Dhanmondi",
+        "city": "Dhaka",
+        "postalCode": "1209",
+        "country": "Bangladesh"
+      },
+      "loyaltyPoints": 300,
+      "registeredAt": "2025-02-20T15:15:00+06:00"
+    },
+    {
+      "id": 6,
+      "name": "Rafiul Islam",
+      "email": "rafiul.islam@example.com",
+      "phone": "+8801711000006",
+      "address": {
+        "street": "22 Bashundhara R/A",
+        "city": "Dhaka",
+        "postalCode": "1229",
+        "country": "Bangladesh"
+      },
+      "loyaltyPoints": 60,
+      "registeredAt": "2025-03-10T18:45:00+06:00"
+    },
+    {
+      "id": 7,
+      "name": "Mehjabin Chowdhury",
+      "email": "mehjabin.c@example.com",
+      "phone": "+8801711000007",
+      "address": {
+        "street": "11 Mohakhali",
+        "city": "Dhaka",
+        "postalCode": "1212",
+        "country": "Bangladesh"
+      },
+      "loyaltyPoints": 180,
+      "registeredAt": "2025-04-01T08:20:00+06:00"
     }
   ]
 }
