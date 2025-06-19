@@ -33,11 +33,12 @@ export const useOrders = () => {
     }
   }, []);
 
-  const fetchOrderbyId = useCallback(async (id: number) => {
+  const fetchOrderById = useCallback(async (id: number) => {
     setLoading(true);
     setError(null);
     try {
       const response = await ordersApi.getOrdersByID(id);
+      return response as Order;
     } catch (error: any) {
       setError(
         error.response?.data?.message || "An error occurred. Please try again."
@@ -71,6 +72,7 @@ export const useOrders = () => {
     totalCount,
     currentPage,
     fetchOrders,
+    fetchOrderById,
     updateOrderStatus,
   };
 };

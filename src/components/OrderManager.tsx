@@ -9,7 +9,6 @@ import { Dropdown } from "primereact/dropdown";
 import { useEffect, useState } from "react";
 import jsPDF from 'jspdf';
 import { useDebounce } from "@/hooks/useDebounce";
-import { useRouter } from "next/navigation";
 export default function OrderManager() {
   const { orders, loading, error, totalCount, currentPage, fetchOrders, updateOrderStatus } =
     useOrders();
@@ -19,7 +18,7 @@ export default function OrderManager() {
   const [rows, setRows] = useState(10);
   const [searchName, setSearchName] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("");
-  const router = useRouter();
+
 
   // Apply debounce to searchName
   const { debouncedValue: debouncedSearchName, clearImmediate } = useDebounce(searchName, 500); // 500ms delay
@@ -92,7 +91,6 @@ export default function OrderManager() {
           setSelectedOrder(rowData);
           setShowDetailsDialog(true);
         }}
-      // onClick={() => router.push(`/orders/${rowData.id}`)}
       />
     );
   };
@@ -177,6 +175,10 @@ export default function OrderManager() {
             <Button
               icon="pi pi-filter-slash"
               className="p-button-outlined"
+              // onClick={() => {
+              //   setSearchName("");
+              //   setSelectedStatus("");
+              // }}
               onClick={clearFilters}
               tooltip="Clear filters"
             />
